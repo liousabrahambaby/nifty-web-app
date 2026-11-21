@@ -78,6 +78,24 @@ login every morning after 7:35 AM, as the exchange requires).
 Then on any morning: cockpit -> "Use Kite instead" -> log in -> copy the code -> GitHub ->
 Run workflow -> premarket -> paste it. From a PC: `python kite_morning.py`.
 
+## AI analysis tab
+Every 4 PM run also does a technical analysis of the daily chart and shows it in the
+**AI analysis** tab:
+- A pattern scanner in `analyze.py` finds candlestick patterns (engulfing, hammer, doji,
+  stars...), chart patterns (double top/bottom, head and shoulders, triangles, wedges,
+  channels), trendlines, support/resistance zones, Fibonacci retracements, RSI divergence,
+  ADX trend strength and swing structure, and merges them into a list of major levels.
+- Claude (`claude-opus-5-5`) reads those findings with the last 40 sessions, the indicators,
+  pivots and option-chain levels, then writes the outlook, conditional suggestions, the
+  levels to watch and what would prove the view wrong.
+- Each day's outlook is saved in `analysis_track.json` and graded against the next
+  session's close, so the tab shows how often it has been right.
+
+To turn Claude on, add an `ANTHROPIC_API_KEY` secret (GitHub -> Settings -> Secrets and
+variables -> Actions). It costs roughly 5-15 US cents a day (one request per weekday). Without the
+key, or if the call fails, the tab shows a rule-based note built from the same scanner
+results. `--demo` and `--no-ai` runs always use the rule-based note.
+
 ## Login
 The site opens on `login.html`. Demo credentials: **admin / admin123**.
 To change them, edit `USERNAME` and `PASS_HASH` at the top of `src/login/LoginPage.jsx`
@@ -91,6 +109,7 @@ Pages with Cloudflare Access, or Netlify with password protection).
 - `data.json`  – everything the page shows (rewritten each run)
 - `track.json` – the permanent signal log. Don't delete it, or the track record restarts.
 - `oc_cache.json` – last good option-chain snapshot, shown (flagged as old) if NSE fails.
+- `analysis_track.json` – every day's AI/technical outlook and whether the next session agreed.
 
 ## If the option chain shows "couldn't be fetched"
 NSE often blocks requests from cloud servers, including GitHub's. Prices, VIX

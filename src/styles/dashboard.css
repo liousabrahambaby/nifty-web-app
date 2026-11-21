@@ -205,6 +205,15 @@ label.tog input { accent-color:var(--ion); vertical-align:-2px; }
 label.tog:has(input:checked) { color:var(--txt); border-color:var(--line-soft); }
 #chart { height:620px; } #oiChart, #vixChart, #cumChart { height:300px; }
 @media (max-width:700px){ #chart { height:480px; } }
+#taChart { height:460px; }
+@media (max-width:700px){ #taChart { height:360px; } }
+
+/* ---------- AI analysis ---------- */
+.ai-text { font-size:14px; line-height:1.6; color:#C9D0F0; margin:8px 0 0; max-width:75ch; }
+.ai-src { font-size:12px; color:var(--mut); margin:12px 0 0; }
+.sc.risk { border-left-color:var(--violet); }
+.sc.risk .tag { color:var(--violet); background:rgba(164,139,255,.12); }
+.pill { text-transform:capitalize; }
 
 .signal { clip-path:var(--chamfer); padding:16px; background:var(--panel-solid); border:0; position:relative; }
 .signal.call { background:linear-gradient(160deg, rgba(46,229,157,.22), var(--panel-solid) 55%); }

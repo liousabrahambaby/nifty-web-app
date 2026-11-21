@@ -10,9 +10,11 @@ import DashboardPanel from './DashboardPanel.jsx'
 import PlaybookPanel from './PlaybookPanel.jsx'
 import OptionsPanel from './OptionsPanel.jsx'
 import TrackPanel from './TrackPanel.jsx'
+import AIAnalysisPanel from './AIAnalysisPanel.jsx'
 
 const TABS = [
   ['dash', 'Dashboard'],
+  ['ai', 'AI analysis'],
   ['tips', 'Levels & tips'],
   ['opt', 'Options & VIX'],
   ['track', 'Track record'],
@@ -55,6 +57,9 @@ export default function App() {
             <Tabs tabs={TABS} value={tab} onChange={setTab} />
             <Panel id="dash" active={tab === 'dash'}>
               <DashboardPanel D={D} active={tab === 'dash'} days={days} setDays={setDays} overlays={overlays} setOverlays={setOverlays} />
+            </Panel>
+            <Panel id="ai" active={tab === 'ai'}>
+              <AIAnalysisPanel D={D} active={tab === 'ai'} />
             </Panel>
             <Panel id="tips" active={tab === 'tips'}>
               <PlaybookPanel D={D} />

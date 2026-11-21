@@ -1170,6 +1170,535 @@ def build_alerts(df, oc, vix, vix_prev, bias, lv):
     return A
 
 
+# =====================================================================
+# Technical analysis: candles, chart patterns, trendlines, S/R zones,
+# Fibonacci, divergences. Feeds the AI analysis section.
+# =====================================================================
+ANALYSIS_TRACK = "analysis_track.json"
+AI_MODEL = "claude-opus-5-5"
+
+
+def swing_points(df, w):
+    """Confirmed swing highs/lows: the bar's high (low) is the extreme of the w bars on either side.
+    The last w bars can't be confirmed yet, so they never count."""
+    hi, lo = df["High"].values, df["Low"].values
+    H, L = [], []
+    for i in range(w, len(df) - w):
+        if hi[i] == hi[i - w:i + w + 1].max() and not (H and i - H[-1] <= w):
+            H.append(i)
+        if lo[i] == lo[i - w:i + w + 1].min() and not (L and i - L[-1] <= w):
+            L.append(i)
+    return H, L
+
+
+def adx(df, n=14):
+    up, dn = df["High"].diff(), -df["Low"].diff()
+    plus = pd.Series(np.where((up > dn) & (up > 0), up, 0.0), index=df.index)
+    minus = pd.Series(np.where((dn > up) & (dn > 0), dn, 0.0), index=df.index)
+    tr = pd.concat([df["High"] - df["Low"], (df["High"] - df["Close"].shift()).abs(),
+                    (df["Low"] - df["Close"].shift()).abs()], axis=1).max(axis=1)
+    atr = tr.ewm(alpha=1 / n, adjust=False).mean()
+    pdi = 100 * plus.ewm(alpha=1 / n, adjust=False).mean() / atr
+    mdi = 100 * minus.ewm(alpha=1 / n, adjust=False).mean() / atr
+    dx = 100 * (pdi - mdi).abs() / (pdi + mdi)
+    return dx.ewm(alpha=1 / n, adjust=False).mean(), pdi, mdi
+
+
+def candle_patterns(df):
+    """Candlestick patterns on the last session (and the two before it for 3-candle patterns)."""
+    o, h, l, c = (df[k].values for k in ("Open", "High", "Low", "Close"))
+    atr = float(df["ATR"].iloc[-1])
+    i = len(df) - 1
+    date = df.index[i].strftime("%Y-%m-%d")
+    body = lambda k: abs(c[k] - o[k])
+    rng = lambda k: max(h[k] - l[k], 1e-9)
+    upper = lambda k: h[k] - max(o[k], c[k])
+    lower = lambda k: min(o[k], c[k]) - l[k]
+    bull = lambda k: c[k] > o[k]
+    prior = c[i - 1] - c[i - 6]  # direction of the five sessions before today
+    out = []
+
+    def add(name, bias, detail):
+        out.append({"name": name, "bias": bias, "date": date, "detail": detail})
+
+    if bull(i) and not bull(i - 1) and c[i] >= o[i - 1] and o[i] <= c[i - 1] and body(i) > body(i - 1):
+        add("Bullish engulfing", "bullish", "Today's up candle swallowed yesterday's down candle: buyers took back control.")
+    elif not bull(i) and bull(i - 1) and o[i] >= c[i - 1] and c[i] <= o[i - 1] and body(i) > body(i - 1):
+        add("Bearish engulfing", "bearish", "Today's down candle swallowed yesterday's up candle: sellers took back control.")
+    if (not bull(i - 2) and body(i - 2) > 0.6 * rng(i - 2) and body(i - 1) < 0.3 * body(i - 2)
+            and bull(i) and c[i] > (o[i - 2] + c[i - 2]) / 2):
+        add("Morning star", "bullish", "A big down day, a small pause, then a strong up day: a classic bottoming sign.")
+    if (bull(i - 2) and body(i - 2) > 0.6 * rng(i - 2) and body(i - 1) < 0.3 * body(i - 2)
+            and not bull(i) and c[i] < (o[i - 2] + c[i - 2]) / 2):
+        add("Evening star", "bearish", "A big up day, a small pause, then a strong down day: a classic topping sign.")
+    if all(bull(k) and body(k) > 0.5 * rng(k) for k in (i - 2, i - 1, i)) and c[i] > c[i - 1] > c[i - 2]:
+        add("Three white soldiers", "bullish", "Three strong up days in a row, each closing higher: steady buying.")
+    if all(not bull(k) and body(k) > 0.5 * rng(k) for k in (i - 2, i - 1, i)) and c[i] < c[i - 1] < c[i - 2]:
+        add("Three black crows", "bearish", "Three strong down days in a row, each closing lower: steady selling.")
+
+    if body(i) >= 0.05 * rng(i) and lower(i) >= 2 * body(i) and upper(i) <= 0.3 * rng(i):
+        if prior < 0:
+            add("Hammer", "bullish", "After a fall, sellers pushed it down but buyers closed it near the high. A bounce often follows if the next day closes higher.")
+        elif prior > 0:
+            add("Hanging man", "bearish", "After a rise, a long lower shadow shows sellers testing the market. A lower close next day would confirm weakness.")
+    elif body(i) >= 0.05 * rng(i) and upper(i) >= 2 * body(i) and lower(i) <= 0.3 * rng(i):
+        if prior > 0:
+            add("Shooting star", "bearish", "After a rise, buyers pushed it up but it closed near the low: rallies are being sold.")
+        elif prior < 0:
+            add("Inverted hammer", "bullish", "After a fall, buyers tried to push it up. Needs a higher close next day to confirm.")
+    elif body(i) <= 0.1 * rng(i):
+        add("Doji", "neutral", "Open and close almost equal: indecision. "
+            + ("After a rise, it can warn of a pause or top." if prior > 0 else "After a fall, it can warn of a pause or bottom." if prior < 0 else ""))
+    if body(i) >= 0.85 * rng(i) and rng(i) > 0.8 * atr:
+        add("Bullish marubozu" if bull(i) else "Bearish marubozu", "bullish" if bull(i) else "bearish",
+            f"A full-bodied {'up' if bull(i) else 'down'} candle with almost no shadows: one side was in control all day.")
+    return out
+
+
+def _line(idx, vals):
+    """Least-squares line through swing points -> (slope per bar, intercept)."""
+    if len(idx) < 2:
+        return None
+    m, b = np.polyfit(np.array(idx, float), np.array(vals, float), 1)
+    return float(m), float(b)
+
+
+def chart_patterns(df, H, L):
+    hi, lo, cl = df["High"].values, df["Low"].values, df["Close"].values
+    n, c = len(df), float(cl[-1])
+    dates = [d.strftime("%Y-%m-%d") for d in df.index]
+    out, lines = [], {}
+    rH = [i for i in H if i >= n - 120]
+    rL = [i for i in L if i >= n - 120]
+
+    def add(name, bias, status, detail, level=None, target=None, points=()):
+        # Skip patterns that have already played out (target reached) or are far from today's price
+        if target is not None and ((bias == "bullish" and c >= target) or (bias == "bearish" and c <= target)):
+            return
+        if level is not None and abs(c / level - 1) > 0.05:
+            return
+        out.append({"name": name, "bias": bias, "status": status, "detail": detail,
+                    "level": None if level is None else round(float(level), 1),
+                    "target": None if target is None else round(float(target), 1),
+                    "points": [{"date": dates[k], "price": round(float(v), 1)} for k, v in points]})
+
+    # Double top / bottom: two similar peaks (troughs) at least 8 sessions apart
+    if len(rH) >= 2:
+        a, b = rH[-2], rH[-1]
+        top, neck = max(hi[a], hi[b]), lo[a:b + 1].min()
+        if b - a >= 8 and abs(hi[a] - hi[b]) / top < 0.015 and n - 1 - b <= 30 \
+                and (top - neck) / neck >= 0.025 and c < top * 1.005:
+            done = c < neck
+            add("Double top", "bearish", "confirmed" if done else "forming",
+                f"Two peaks near {top:,.0f} with a neckline at {neck:,.0f}. "
+                + ("Price has closed below the neckline, which confirms it." if done else
+                   f"A daily close below {neck:,.0f} would confirm it; until then it's only a warning."),
+                neck, neck - (top - neck), [(a, hi[a]), (b, hi[b])])
+    if len(rL) >= 2:
+        a, b = rL[-2], rL[-1]
+        bot, neck = min(lo[a], lo[b]), hi[a:b + 1].max()
+        if b - a >= 8 and abs(lo[a] - lo[b]) / bot < 0.015 and n - 1 - b <= 30 \
+                and (neck - bot) / bot >= 0.025 and c > bot * 0.995:
+            done = c > neck
+            add("Double bottom", "bullish", "confirmed" if done else "forming",
+                f"Two troughs near {bot:,.0f} with a neckline at {neck:,.0f}. "
+                + ("Price has closed above the neckline, which confirms it." if done else
+                   f"A daily close above {neck:,.0f} would confirm it."),
+                neck, neck + (neck - bot), [(a, lo[a]), (b, lo[b])])
+
+    # Head and shoulders (and inverse): three peaks, the middle one highest
+    if len(rH) >= 3:
+        l_, m_, r_ = rH[-3:]
+        if hi[m_] > max(hi[l_], hi[r_]) * 1.02 and abs(hi[l_] - hi[r_]) / hi[m_] < 0.03 and n - 1 - r_ <= 30:
+            neck = (lo[l_:m_ + 1].min() + lo[m_:r_ + 1].min()) / 2
+            if c < hi[m_]:
+                done = c < neck
+                add("Head and shoulders", "bearish", "confirmed" if done else "forming",
+                    f"Peaks at {hi[l_]:,.0f}, {hi[m_]:,.0f} (head) and {hi[r_]:,.0f}; neckline about {neck:,.0f}. "
+                    + ("Price is below the neckline: a major topping pattern is in play." if done else
+                       f"A close below {neck:,.0f} would complete this topping pattern."),
+                    neck, neck - (hi[m_] - neck), [(l_, hi[l_]), (m_, hi[m_]), (r_, hi[r_])])
+    if len(rL) >= 3:
+        l_, m_, r_ = rL[-3:]
+        if lo[m_] < min(lo[l_], lo[r_]) * 0.98 and abs(lo[l_] - lo[r_]) / lo[m_] < 0.03 and n - 1 - r_ <= 30:
+            neck = (hi[l_:m_ + 1].max() + hi[m_:r_ + 1].max()) / 2
+            if c > lo[m_]:
+                done = c > neck
+                add("Inverse head and shoulders", "bullish", "confirmed" if done else "forming",
+                    f"Troughs at {lo[l_]:,.0f}, {lo[m_]:,.0f} (head) and {lo[r_]:,.0f}; neckline about {neck:,.0f}. "
+                    + ("Price is above the neckline: a major bottoming pattern is in play." if done else
+                       f"A close above {neck:,.0f} would complete this bottoming pattern."),
+                    neck, neck + (neck - lo[m_]), [(l_, lo[l_]), (m_, lo[m_]), (r_, lo[r_])])
+
+    # Trendlines through the last 3 swing highs / lows of the past 60 sessions, and the shape they make
+    tH = [i for i in H if i >= n - 60][-3:]
+    tL = [i for i in L if i >= n - 60][-3:]
+    lh, ll = _line(tH, hi[tH]), _line(tL, lo[tL])
+    # A line that has drifted more than 5% from price no longer matters for the next session
+    near = lambda ln: ln and abs((ln[0] * n + ln[1]) / c - 1) <= 0.05
+    lh, ll = (lh if near(lh) else None), (ll if near(ll) else None)
+    for key, ln, idx in [("resistance", lh, tH), ("support", ll, tL)]:
+        if ln:
+            m, b = ln
+            lines[key] = {"from": {"date": dates[idx[0]], "price": round(m * idx[0] + b, 1)},
+                          "to": {"date": dates[-1], "price": round(m * (n - 1) + b, 1)},
+                          "today": round(m * (n - 1) + b, 1), "next": round(m * n + b, 1),
+                          "slope_pct": round(m / c * 100 * 20, 2)}  # % per 20 sessions
+    if lh and ll:
+        sh, sl = lh[0] / c * 100, ll[0] / c * 100  # % per session
+        up_line, lo_line = lines["resistance"]["next"], lines["support"]["next"]
+        flat = 0.025
+        shape = None
+        if abs(sh) < flat and sl > flat:
+            shape = ("Ascending triangle", "bullish", "Flat highs with rising lows: buyers keep stepping in higher. Usually breaks upward.")
+        elif sh < -flat and abs(sl) < flat:
+            shape = ("Descending triangle", "bearish", "Falling highs with flat lows: sellers keep pressing. Usually breaks downward.")
+        elif sh < -flat and sl > flat:
+            shape = ("Symmetrical triangle", "neutral", "Highs falling and lows rising: the range is squeezing. The break direction sets the next move.")
+        elif sh > flat and sl > flat:
+            shape = (("Rising wedge", "bearish", "Both lines rising but the lows climb faster: the rally is losing room. Often breaks down.")
+                     if sl > sh * 1.3 else
+                     ("Rising channel", "bullish", "Higher highs and higher lows inside parallel lines: an orderly uptrend."))
+        elif sh < -flat and sl < -flat:
+            shape = (("Falling wedge", "bullish", "Both lines falling but the highs drop faster: selling is running out. Often breaks up.")
+                     if sh < sl * 1.3 else
+                     ("Falling channel", "bearish", "Lower highs and lower lows inside parallel lines: an orderly downtrend."))
+        if shape and up_line > lo_line:
+            status = "broken up" if c > up_line * 1.003 else "broken down" if c < lo_line * 0.997 else "forming"
+            add(shape[0], shape[1], status,
+                shape[2] + f" Upper line next session about {up_line:,.0f}, lower line about {lo_line:,.0f}.",
+                up_line if shape[1] != "bearish" else lo_line)
+    return out, lines
+
+
+def sr_zones(df, H, L, c, atr):
+    """Group swing highs and lows of the last year that sit close together into price zones."""
+    n = len(df)
+    pts = sorted([(float(df["High"].iloc[i]), i) for i in H if i >= n - 250] +
+                 [(float(df["Low"].iloc[i]), i) for i in L if i >= n - 250])
+    tol = max(0.006 * c, 0.5 * atr)
+    groups, cur = [], []
+    for p in pts:
+        if cur and p[0] - cur[0][0] > tol:
+            groups.append(cur)
+            cur = []
+        cur.append(p)
+    if cur:
+        groups.append(cur)
+    zones = []
+    for g in groups:
+        if len(g) < 2:
+            continue
+        lvl = float(np.mean([p for p, _ in g]))
+        last = max(i for _, i in g)
+        zones.append({"level": round(lvl, 1), "low": round(min(p for p, _ in g), 1), "high": round(max(p for p, _ in g), 1),
+                      "touches": len(g), "last_touch": df.index[last].strftime("%Y-%m-%d"),
+                      "side": "resistance" if lvl > c else "support",
+                      "strength": round(len(g) + (1 if last >= n - 60 else 0), 1)})
+    above = sorted([z for z in zones if z["side"] == "resistance"], key=lambda z: z["level"])[:3]
+    below = sorted([z for z in zones if z["side"] == "support"], key=lambda z: -z["level"])[:3]
+    return sorted(above + below, key=lambda z: -z["level"])
+
+
+def fib_levels(df):
+    w = df.iloc[-120:]
+    ih, il = int(np.argmax(w["High"].values)), int(np.argmin(w["Low"].values))
+    hi, lo = float(w["High"].iloc[ih]), float(w["Low"].iloc[il])
+    up = il < ih  # swing went low -> high, so retracements are supports below the high
+    lv = {f"{r * 100:g}%": round(hi - r * (hi - lo), 1) if up else round(lo + r * (hi - lo), 1)
+          for r in (0.236, 0.382, 0.5, 0.618, 0.786)}
+    return {"direction": "up" if up else "down", "swing_high": round(hi, 1), "swing_low": round(lo, 1),
+            "high_date": w.index[ih].strftime("%Y-%m-%d"), "low_date": w.index[il].strftime("%Y-%m-%d"), "levels": lv}
+
+
+def divergence(df):
+    H, L = swing_points(df.iloc[-60:], 3)
+    hi, lo, rsi = df["High"].values[-60:], df["Low"].values[-60:], df["RSI"].values[-60:]
+    out = []
+    if len(H) >= 2 and H[-1] >= 60 - 18:
+        a, b = H[-2], H[-1]
+        if hi[b] > hi[a] and rsi[b] < rsi[a] - 2:
+            out.append({"name": "Bearish RSI divergence", "bias": "bearish",
+                        "detail": f"Price made a higher high ({hi[b]:,.0f} vs {hi[a]:,.0f}) but RSI made a lower high "
+                                  f"({rsi[b]:.0f} vs {rsi[a]:.0f}): the rally is losing strength."})
+    if len(L) >= 2 and L[-1] >= 60 - 18:
+        a, b = L[-2], L[-1]
+        if lo[b] < lo[a] and rsi[b] > rsi[a] + 2:
+            out.append({"name": "Bullish RSI divergence", "bias": "bullish",
+                        "detail": f"Price made a lower low ({lo[b]:,.0f} vs {lo[a]:,.0f}) but RSI made a higher low "
+                                  f"({rsi[b]:.0f} vs {rsi[a]:.0f}): selling pressure is fading."})
+    return out
+
+
+def trend_structure(df, H, L):
+    hi, lo = df["High"].values, df["Low"].values
+    if len(H) < 2 or len(L) < 2:
+        return {"label": "unclear", "detail": "Not enough swings yet."}
+    hh, hl = hi[H[-1]] > hi[H[-2]], lo[L[-1]] > lo[L[-2]]
+    if hh and hl:
+        return {"label": "uptrend", "detail": "Higher highs and higher lows."}
+    if not hh and not hl:
+        return {"label": "downtrend", "detail": "Lower highs and lower lows."}
+    return {"label": "sideways", "detail": "Mixed swings: " + ("higher high but lower low (widening)." if hh else "lower high but higher low (narrowing).")}
+
+
+def technical_analysis(df):
+    c, atr = float(df["Close"].iloc[-1]), float(df["ATR"].iloc[-1])
+    H, L = swing_points(df, 5)
+    a, pdi, mdi = adx(df)
+    patterns, lines = chart_patterns(df, H, L)
+    zones = sr_zones(df, H, L, c, atr)
+    fib = fib_levels(df)
+    struct = trend_structure(df, H, L)
+    hi52 = float(df["High"].iloc[-252:].max())
+    lo52 = float(df["Low"].iloc[-252:].min())
+
+    # Major points: merge every level source, drop near-duplicates, keep those within 8% of price
+    cand = [(z["level"], f"{z['side'].title()} zone ({z['touches']} touches)", 3 + z["touches"]) for z in zones]
+    cand += [(lines[k]["next"], "Trendline through swing " + ("highs" if k == "resistance" else "lows"), 3) for k in lines]
+    cand += [(p["level"], f"{p['name']} {'neckline' if 'top' in p['name'] or 'bottom' in p['name'] or 'shoulders' in p['name'] else 'line'}", 4)
+             for p in patterns if p["level"]]
+    cand += [(p["target"], f"{p['name']} target", 2) for p in patterns if p["target"]]
+    cand += [(v, f"Fibonacci {k}", 2) for k, v in fib["levels"].items() if k in ("38.2%", "50%", "61.8%")]
+    cand += [(hi52, "52-week high", 3), (lo52, "52-week low", 3)]
+    if not pd.isna(df["SMA200"].iloc[-1]):
+        cand.append((float(df["SMA200"].iloc[-1]), "200-day average", 3))
+    key = []
+    for v, name, pr in sorted(cand, key=lambda t: -t[2]):
+        if v is None or abs(v / c - 1) > 0.08:
+            continue
+        if any(abs(v / k["price"] - 1) < 0.0025 for k in key):
+            continue
+        key.append({"price": round(float(v), 1), "label": name, "side": "resistance" if v > c else "support",
+                    "dist_pct": round((v / c - 1) * 100, 2)})
+    key = sorted(key, key=lambda k: -k["price"])[:12]
+
+    return {"close": round(c, 1), "atr": round(atr, 1),
+            "adx": {"value": round(float(a.iloc[-1]), 1), "plus_di": round(float(pdi.iloc[-1]), 1),
+                    "minus_di": round(float(mdi.iloc[-1]), 1),
+                    "read": ("strong trend" if a.iloc[-1] >= 25 else "weak or no trend" if a.iloc[-1] < 20 else "trend building")
+                            + (", buyers stronger" if pdi.iloc[-1] > mdi.iloc[-1] else ", sellers stronger")},
+            "structure": struct, "candles": candle_patterns(df), "patterns": patterns,
+            "divergence": divergence(df), "trendlines": lines, "zones": zones, "fib": fib,
+            "range_52w": [round(lo52, 1), round(hi52, 1)], "key_levels": key}
+
+
+# ---------- Outlook: rule-based, and the Claude-written version ----------
+def rule_outlook(ta, D):
+    """Score the evidence. Used as the fallback note and passed to Claude as one input."""
+    s, ev = 0.0, []
+    st = ta["structure"]["label"]
+    if st in ("uptrend", "downtrend"):
+        s += 1 if st == "uptrend" else -1
+        ev.append(f"Swing structure: {ta['structure']['detail'].lower()}")
+    A = ta["adx"]
+    if A["value"] >= 20:
+        s += 1 if A["plus_di"] > A["minus_di"] else -1
+        ev.append(f"ADX {A['value']}: {A['read']}")
+    for p in ta["patterns"]:
+        w = 1.5 if p["status"] in ("confirmed", "broken up", "broken down") else 0.5
+        s += {"bullish": w, "bearish": -w}.get(p["bias"], 0)
+        ev.append(f"{p['name']} ({p['status']})")
+    for p in ta["candles"] + ta["divergence"]:
+        s += {"bullish": 0.5, "bearish": -0.5}.get(p["bias"], 0)
+        ev.append(p["name"])
+    s += max(-2, min(2, D["signal"]["score"] / 2))
+    outlook = "bullish" if s >= 2 else "bearish" if s <= -2 else "range-bound" if A["value"] < 20 else "neutral"
+    conf = "high" if abs(s) >= 4 else "medium" if abs(s) >= 2 else "low"
+    return outlook, conf, round(s, 1), ev
+
+
+def rule_note(ta, D, outlook, conf, ev):
+    c = ta["close"]
+    res = [k for k in ta["key_levels"] if k["price"] > c][-1:]  # nearest above
+    sup = [k for k in ta["key_levels"] if k["price"] < c][:1]   # nearest below
+    r = res[0] if res else {"price": D["levels"]["R1"], "label": "R1"}
+    s_ = sup[0] if sup else {"price": D["levels"]["S1"], "label": "S1"}
+    f = lambda v: f"{v:,.0f}"
+    head = {"bullish": f"Charts lean bullish. Holding above {f(s_['price'])} keeps buyers in charge.",
+            "bearish": f"Charts lean bearish. Staying below {f(r['price'])} keeps sellers in charge.",
+            "neutral": f"Mixed signals. Let a break of {f(r['price'])} or {f(s_['price'])} pick the direction.",
+            "range-bound": f"No trend. Expect a range between {f(s_['price'])} and {f(r['price'])}."}[outlook]
+    sug = [
+        {"kind": "call", "title": f"Upside trigger above {f(r['price'])}",
+         "detail": f"A daily or 15-minute close above the {r['label'].lower()} at {f(r['price'])} opens the next leg up. "
+                   + ("This fits the current lean." if outlook == "bullish" else "This goes against the current lean, so trade smaller.")},
+        {"kind": "put", "title": f"Downside trigger below {f(s_['price'])}",
+         "detail": f"A close below the {s_['label'].lower()} at {f(s_['price'])} opens room lower. "
+                   + ("This fits the current lean." if outlook == "bearish" else "This goes against the current lean, so trade smaller.")},
+        {"kind": "wait", "title": "Inside the range, stay patient",
+         "detail": f"Between {f(s_['price'])} and {f(r['price'])} there's no edge for option buyers; time decay works against you."},
+    ]
+    for p in ta["patterns"] + ta["divergence"]:
+        sug.append({"kind": "risk", "title": p["name"], "detail": p["detail"]})
+    return {"outlook": outlook, "confidence": conf, "headline": head,
+            "summary": "Rule-based read of the evidence: " + ("; ".join(ev) if ev else "no strong patterns today") + ".",
+            "pattern_read": "; ".join(f"{p['name']} ({p['status']})" for p in ta["patterns"]) or "No chart patterns detected.",
+            "suggestions": sug[:6],
+            "key_points": [{"price": k["price"], "label": k["label"], "side": k["side"], "why": ""} for k in ta["key_levels"]],
+            "invalidation": f"A close beyond {f(r['price'])} or {f(s_['price'])} against the lean."}
+
+
+AI_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "outlook": {"type": "string", "enum": ["bullish", "bearish", "neutral", "range-bound"]},
+        "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+        "headline": {"type": "string"},
+        "summary": {"type": "string"},
+        "pattern_read": {"type": "string"},
+        "suggestions": {"type": "array", "items": {
+            "type": "object",
+            "properties": {"kind": {"type": "string", "enum": ["call", "put", "wait", "risk"]},
+                           "title": {"type": "string"}, "detail": {"type": "string"}},
+            "required": ["kind", "title", "detail"], "additionalProperties": False}},
+        "key_points": {"type": "array", "items": {
+            "type": "object",
+            "properties": {"price": {"type": "number"}, "label": {"type": "string"},
+                           "side": {"type": "string", "enum": ["resistance", "support", "pivot"]},
+                           "why": {"type": "string"}},
+            "required": ["price", "label", "side", "why"], "additionalProperties": False}},
+        "invalidation": {"type": "string"},
+    },
+    "required": ["outlook", "confidence", "headline", "summary", "pattern_read", "suggestions", "key_points", "invalidation"],
+    "additionalProperties": False,
+}
+
+AI_SYSTEM = """You write the after-close technical note on the Nifty 50 for a dashboard used by Indian retail traders, many of whom buy index options.
+
+You receive the last 40 daily sessions, the current indicators, the rule-based signal, pivot and option-chain levels, and what a pattern scanner found: candlestick patterns, chart patterns, trendlines, support/resistance zones, Fibonacci levels, RSI divergence, ADX and swing structure. Treat the scanner's output as a first pass, not as truth. Check each finding against the price data, say plainly when a pattern is weak or the evidence conflicts, and weigh it accordingly.
+
+Use only the data given. Do not mention news, events or prices that are not in it. Every price you cite must come from the data or follow directly from it.
+
+What to write:
+- outlook and confidence for the next session or two. Use low confidence when the evidence conflicts; that is common and fine.
+- headline: one sentence, at most 25 words, that a trader can act on.
+- summary: 3 to 5 sentences on trend, momentum and where price sits relative to the levels that matter.
+- pattern_read: 2 to 4 sentences on the patterns that matter and how reliable they look here.
+- suggestions: 3 to 6 items. Make them conditional and level-based ("if Nifty closes above X, then ..."), with a trigger, a target and an exit level where it applies. kind is call (upside plan), put (downside plan), wait (no-trade conditions) or risk (something that could go wrong). Include at least one wait or risk item.
+- key_points: the 5 to 10 price levels to watch next session, each with a short reason. side is resistance above the last close, support below it, or pivot for a level price is sitting on.
+- invalidation: the price action that would prove this outlook wrong.
+
+Write in plain English for people who know the basics, with no jargon beyond the indicator names. Don't add disclaimers; the page already shows one."""
+
+
+def ai_note(ctx):
+    """Ask Claude for the note. Returns a dict, or None to fall back to the rule-based note."""
+    try:
+        import anthropic
+    except ImportError:
+        print("AI analysis skipped: the anthropic package isn't installed")
+        return None
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        print("AI analysis skipped: ANTHROPIC_API_KEY isn't set (using the rule-based note)")
+        return None
+    try:
+        client = anthropic.Anthropic()
+        resp = client.beta.messages.create(
+            model=AI_MODEL,
+            max_tokens=16000,
+            betas=["server-side-fallback-2026-07-01"],
+            fallbacks="default",  # if the model declines, the API retries on a fallback model in the same call
+            output_config={"effort": "high", "format": {"type": "json_schema", "schema": AI_SCHEMA}},
+            system=AI_SYSTEM,
+            messages=[{"role": "user", "content": "Data for the note, as JSON:\n" + json.dumps(ctx, separators=(",", ":"))
+                       + f"\n\nWrite the note for the session on {ctx['next_session']}."}],
+        )
+    except anthropic.AuthenticationError:
+        print("AI analysis failed: the API key was rejected")
+        return None
+    except anthropic.RateLimitError:
+        print("AI analysis failed: rate limited")
+        return None
+    except anthropic.APIStatusError as e:
+        print(f"AI analysis failed: API error {e.status_code}")
+        return None
+    except anthropic.APIConnectionError:
+        print("AI analysis failed: couldn't reach the API")
+        return None
+    if resp.stop_reason != "end_turn":
+        print(f"AI analysis unusable: stop_reason={resp.stop_reason}")
+        return None
+    text = next((b.text for b in resp.content if b.type == "text"), None)
+    try:
+        note = json.loads(text)
+    except (TypeError, ValueError):
+        print("AI analysis unusable: response wasn't valid JSON")
+        return None
+    note["model"] = resp.model
+    print(f"AI analysis by {resp.model}: {note['outlook']} ({note['confidence']}), "
+          f"{resp.usage.input_tokens} in / {resp.usage.output_tokens} out tokens")
+    return note
+
+
+def ai_context(df, ta, D):
+    w = df.iloc[-40:]
+    r = df.iloc[-1]
+    oc = D.get("option_chain")
+    return {
+        "as_of": D["as_of"], "next_session": D["playbook"]["session"],
+        "sessions": [{"date": d.strftime("%Y-%m-%d"), "o": round(float(x.Open), 1), "h": round(float(x.High), 1),
+                      "l": round(float(x.Low), 1), "c": round(float(x.Close), 1), "rsi": round(float(x.RSI), 1),
+                      "macd_hist": round(float(x.MACD_HIST), 1)} for d, x in w.iterrows()],
+        "indicators": {k: (None if pd.isna(r[k]) else round(float(r[k]), 1))
+                       for k in ["SMA20", "SMA50", "SMA200", "BB_UP", "BB_LO", "RSI", "MACD", "MACD_SIG", "ATR"]},
+        "signal": D["signal"], "pivots_and_oi_levels": D["levels"],
+        "option_chain": None if not oc else {k: oc.get(k) for k in ("expiry", "pcr", "max_ce_oi_strike", "max_pe_oi_strike", "max_pain", "stale")},
+        "india_vix": D.get("vix"), "alerts": [a["title"] for a in D.get("alerts", [])],
+        "scanner": ta,
+    }
+
+
+def update_analysis_track(df, entry):
+    """Log today's outlook and grade earlier ones against the next session's close."""
+    entries = []
+    if os.path.exists(ANALYSIS_TRACK):
+        with open(ANALYSIS_TRACK) as f:
+            entries = json.load(f).get("entries", [])
+    dates = [d.strftime("%Y-%m-%d") for d in df.index]
+    for e in entries:
+        if e.get("result") is None and e["date"] in dates:
+            i = dates.index(e["date"])
+            if i + 1 < len(dates):
+                nxt = float(df["Close"].iloc[i + 1])
+                ch = (nxt / e["close"] - 1) * 100
+                e["next_close"], e["next_change_pct"] = round(nxt, 1), round(ch, 2)
+                e["result"] = ("right" if {"bullish": ch > 0, "bearish": ch < 0}.get(e["outlook"], abs(ch) < 0.5)
+                               else "wrong")
+    entries = [e for e in entries if e["date"] != entry["date"]] + [entry]
+    entries.sort(key=lambda e: e["date"])
+    entries = entries[-300:]
+    with open(ANALYSIS_TRACK, "w") as f:
+        json.dump({"entries": entries}, f, indent=1)
+    graded = [e for e in entries if e.get("result")]
+    return entries[::-1][:30], {
+        "graded": len(graded),
+        "hit_rate": round(sum(e["result"] == "right" for e in graded) / len(graded) * 100, 1) if graded else None,
+        "ai_hit_rate": (lambda g: round(sum(e["result"] == "right" for e in g) / len(g) * 100, 1) if g else None)(
+            [e for e in graded if e.get("source") == "claude"]),
+    }
+
+
+def build_analysis(demo, df, D):
+    ta = technical_analysis(df)
+    outlook, conf, score, ev = rule_outlook(ta, D)
+    note = None if (demo or "--no-ai" in sys.argv) else ai_note(ai_context(df, ta, D))
+    source = "claude" if note else "rules"
+    if not note:
+        note = rule_note(ta, D, outlook, conf, ev)
+    c = ta["close"]
+    note["key_points"] = sorted(
+        ({**k, "price": round(float(k["price"]), 1), "dist_pct": round((float(k["price"]) / c - 1) * 100, 2)}
+         for k in note["key_points"] if 0.85 < float(k["price"]) / c < 1.15),
+        key=lambda k: -k["price"])
+    hist, summary = update_analysis_track(df, {
+        "date": D["as_of"], "close": c, "outlook": note["outlook"], "confidence": note["confidence"],
+        "source": source, "headline": note["headline"], "result": None})
+    return {"source": source, "for_session": D["playbook"]["session"], "made_at": D["updated"],
+            "rule_outlook": {"outlook": outlook, "confidence": conf, "score": score, "evidence": ev},
+            "note": note, "ta": ta, "history": hist, "summary": summary}
+
+
 def premarket_evening(demo, df, close):
     """Evening run: grade this morning's forecast, refit the model, and note
     where GIFT Nifty stood at Nifty's close (the reference for tomorrow)."""
@@ -1265,6 +1794,10 @@ def main():
         "global": get_global(demo, as_of.strftime("%Y-%m-%d")),
         "premarket": premarket_evening(demo, df, float(last.Close)),
     }
+    try:
+        data["analysis"] = build_analysis(demo, df, data)
+    except Exception as e:  # never let the analysis section block the main data update
+        print("Technical analysis failed:", type(e).__name__, e)
     with open("data.json", "w") as f:
         json.dump(data, f)
     print(f"{data['as_of']} close={last.Close:.1f} vix={vix} pcr={oc and oc['pcr']} "
