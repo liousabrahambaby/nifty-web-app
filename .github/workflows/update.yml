@@ -2,6 +2,10 @@
 # Pre-market run every weekday at 8:15 AM IST (02:45 UTC): news, global markets and the
 # opening-gap forecast. GitHub can start scheduled runs 5-20 minutes late, so 8:15 lands
 # it close to 8:30 and well before the 9:15 open.
+# News/global run every 4 hours (:17 past 00/04/08/12/16/20 UTC = 5:47 AM, 9:47 AM,
+# 1:47 PM, 5:47 PM, 9:47 PM and 1:47 AM IST, all week): news and global markets only. Nifty prices,
+# signals and the gap forecast are untouched, so they still change only at 4 PM / 8:15 AM.
+# (:17 rather than :00 because GitHub's top-of-the-hour queue is the most delayed.)
 #
 # After each data update the React site is rebuilt and deployed to GitHub Pages.
 # A push to main (code changes, or data pushed by update_local / premarket_local)
@@ -12,14 +16,15 @@ on:
   schedule:
     - cron: "30 10 * * 1-5"
     - cron: "45 2 * * 1-5"
+    - cron: "17 */4 * * *"   # every 4 hours: news + global markets
   push:
     branches: [main]
   workflow_dispatch:      # lets you run it manually from the Actions tab
     inputs:
       mode:
-        description: "full (after close) or premarket (morning forecast)"
+        description: "full (after close), premarket (morning forecast) or hourly (news + global markets)"
         type: choice
-        options: [full, premarket]
+        options: [full, premarket, hourly]
         default: full
       request_token:
         description: "Kite request token (optional, from the Connect GIFT Nifty page). Adds GIFT Nifty to the forecast."
@@ -53,6 +58,8 @@ jobs:
         run: |
           if [ "${{ github.event.schedule }}" = "45 2 * * 1-5" ] || [ "${{ inputs.mode }}" = "premarket" ]; then
             python analyze.py --premarket
+          elif [ "${{ github.event.schedule }}" = "17 */4 * * *" ] || [ "${{ inputs.mode }}" = "hourly" ]; then
+            python analyze.py --hourly
           else
             python analyze.py
           fi
@@ -62,7 +69,7 @@ jobs:
           git config user.email "actions@github.com"
           git add data.json track.json
           for f in oc_cache.json gap_track.json; do [ -f "$f" ] && git add "$f"; done
-          git diff --cached --quiet || git commit -m "Data update $(date -u +%F)"
+          git diff --cached --quiet || git commit -m "Data update $(date -u '+%F %H:%M') UTC"
           git pull --rebase -q || true
           git push
 

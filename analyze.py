@@ -717,6 +717,24 @@ def premarket(demo):
     print("Pre-market:", pred.get("call"), pred.get("pct"), "via", pred.get("method"))
 
 
+def hourly(demo):
+    """Hourly run: refresh news and global markets only. Nifty prices, signals, the track
+    record and the opening-gap forecast are left alone (those come from the 4 PM full run
+    and the 8:15 AM pre-market run)."""
+    with open("data.json") as f:
+        data = json.load(f)
+    fresh = get_news(demo)
+    if not fresh["fii_dii"] and data.get("news", {}).get("fii_dii"):
+        fresh["fii_dii"] = data["news"]["fii_dii"]  # keep the last figures rather than none
+    data["news"] = fresh
+    glob = get_global(demo, data["as_of"])
+    if glob["rows"] or not data.get("global"):  # keep the last good snapshot if the fetch failed
+        data["global"] = glob
+    with open("data.json", "w") as f:
+        json.dump(data, f)
+    print(f"Hourly refresh: {len(fresh['items'])} headlines, {len(glob['rows'])} global markets")
+
+
 def news_only(demo):
     """Refresh just the news section of an existing data.json (used by the morning run)."""
     with open("data.json") as f:
@@ -1178,6 +1196,8 @@ def main():
     demo = "--demo" in sys.argv
     if "--premarket" in sys.argv:
         return premarket(demo)
+    if "--hourly" in sys.argv:
+        return hourly(demo)
     if "--news-only" in sys.argv:
         return news_only(demo)
     df, vix_s = load_demo() if demo else load_live()
