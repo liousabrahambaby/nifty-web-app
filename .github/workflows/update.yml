@@ -1,0 +1,92 @@
+# Full refresh every weekday at 4:00 PM IST (10:30 UTC), after NSE closes at 3:30 PM.
+# Pre-market run every weekday at 8:15 AM IST (02:45 UTC): news, global markets and the
+# opening-gap forecast. GitHub can start scheduled runs 5-20 minutes late, so 8:15 lands
+# it close to 8:30 and well before the 9:15 open.
+#
+# After each data update the React site is rebuilt and deployed to GitHub Pages.
+# A push to main (code changes, or data pushed by update_local / premarket_local)
+# skips the analysis and just rebuilds and deploys.
+name: Update Nifty data
+
+on:
+  schedule:
+    - cron: "30 10 * * 1-5"
+    - cron: "45 2 * * 1-5"
+  push:
+    branches: [main]
+  workflow_dispatch:      # lets you run it manually from the Actions tab
+    inputs:
+      mode:
+        description: "full (after close) or premarket (morning forecast)"
+        type: choice
+        options: [full, premarket]
+        default: full
+      request_token:
+        description: "Kite request token (optional, from the Connect GIFT Nifty page). Adds GIFT Nifty to the forecast."
+        type: string
+        required: false
+
+concurrency:            # never let two runs write data.json or deploy at the same time
+  group: nifty-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Run analysis
+        env:   # optional: only needed for GIFT Nifty (Settings -> Secrets and variables -> Actions)
+          KITE_API_KEY: ${{ secrets.KITE_API_KEY }}
+          KITE_API_SECRET: ${{ secrets.KITE_API_SECRET }}
+          KITE_REQUEST_TOKEN: ${{ inputs.request_token }}
+        run: |
+          if [ "${{ github.event.schedule }}" = "45 2 * * 1-5" ] || [ "${{ inputs.mode }}" = "premarket" ]; then
+            python analyze.py --premarket
+          else
+            python analyze.py
+          fi
+      - name: Commit new data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data.json track.json
+          for f in oc_cache.json gap_track.json; do [ -f "$f" ] && git add "$f"; done
+          git diff --cached --quiet || git commit -m "Data update $(date -u +%F)"
+          git pull --rebase -q || true
+          git push
+
+  deploy:
+    needs: update
+    # runs after a successful update, or on its own for a push (when update is skipped)
+    if: ${{ !cancelled() && needs.update.result != 'failure' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}   # the branch tip, so it includes the data commit made above
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

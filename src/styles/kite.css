@@ -1,0 +1,18 @@
+:root { --space:#0E1433; --panel:#171F4A; --line:#2A3570; --ion:#45D8FF; --bull:#2EE59D; --bear:#FF5C7A; --amber:#FFB547; --txt:#E8ECFF; --mut:#8E98C8;
+        --chamfer:polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; display:grid; place-items:center; padding:20px; font:15px/1.6 'Sora', system-ui, sans-serif; color:var(--txt);
+       background:var(--space) radial-gradient(900px 500px at 70% 0%, rgba(69,216,255,.16), transparent 60%); }
+.card { width:100%; max-width:440px; clip-path:var(--chamfer); padding:26px 24px; background:linear-gradient(150deg, rgba(69,216,255,.12), var(--panel) 45%); }
+h1 { font:700 22px 'Chakra Petch', sans-serif; margin:12px 0 4px; letter-spacing:.02em; }
+p { margin:8px 0; color:#C9D0F0; font-size:14px; }
+ol { padding-left:20px; margin:12px 0; font-size:14px; color:#C9D0F0; } li { margin-bottom:8px; }
+.btn { display:block; width:100%; text-align:center; padding:12px; border:0; border-radius:6px; cursor:pointer; text-decoration:none;
+       font:600 16px 'Chakra Petch', sans-serif; letter-spacing:.04em; color:#06202B; background:var(--ion); margin-top:14px; }
+.btn.alt { background:transparent; color:var(--ion); border:1px solid var(--ion); }
+.code { font:600 15px 'Chakra Petch', monospace; word-break:break-all; padding:12px; border-radius:6px; border:1px dashed var(--ion);
+        background:rgba(14,20,51,.7); margin:12px 0 0; user-select:all; }
+.note { border-left:3px solid var(--amber); background:rgba(255,181,71,.1); padding:9px 12px; border-radius:4px; font-size:13px; margin-top:14px; }
+.ok { color:var(--bull); } .bad { color:var(--bear); }
+a { color:var(--ion); }
+.back { display:inline-block; margin-top:16px; font-size:14px; }

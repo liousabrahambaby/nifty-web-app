@@ -1,0 +1,1461 @@
+{
+ "entries": [
+  {
+   "date": "2026-08-28",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 17288.84,
+   "levels": {
+    "R2": 17469.1,
+    "R1": 17379.0,
+    "Pivot": 17297.1,
+    "S1": 17206.9,
+    "S2": 17125.0
+   },
+   "vix": 22.72,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-08-31",
+    "next_close": 17194.88,
+    "move": -93.96,
+    "result": "Closed at day end",
+    "points": 12.0,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-08-31",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 17194.88,
+   "levels": {
+    "R2": 17260.4,
+    "R1": 17227.6,
+    "Pivot": 17193.1,
+    "S1": 17160.3,
+    "S2": 17125.8
+   },
+   "vix": 22.29,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-01",
+    "next_close": 17051.15,
+    "move": -143.73,
+    "result": "Target hit",
+    "points": 34.5,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-09-01",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 17051.15,
+   "levels": {
+    "R2": 17256.1,
+    "R1": 17153.6,
+    "Pivot": 17050.7,
+    "S1": 16948.2,
+    "S2": 16845.3
+   },
+   "vix": 22.02,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-02",
+    "next_close": 17189.5,
+    "move": 138.35,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-02",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 17189.5,
+   "levels": {
+    "R2": 17309.3,
+    "R1": 17249.4,
+    "Pivot": 17136.6,
+    "S1": 17076.7,
+    "S2": 16963.9
+   },
+   "vix": 21.94,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-03",
+    "next_close": 17116.36,
+    "move": -73.14,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-09-03",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 17116.36,
+   "levels": {
+    "R2": 17187.4,
+    "R1": 17151.9,
+    "Pivot": 17130.1,
+    "S1": 17094.6,
+    "S2": 17072.9
+   },
+   "vix": 21.54,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-04",
+    "next_close": 17355.68,
+    "move": 239.32,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-04",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 17355.68,
+   "levels": {
+    "R2": 17507.6,
+    "R1": 17431.6,
+    "Pivot": 17378.3,
+    "S1": 17302.4,
+    "S2": 17249.0
+   },
+   "vix": 20.97,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-07",
+    "next_close": 17241.19,
+    "move": -114.49,
+    "result": "Target hit",
+    "points": 53.4,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-09-07",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 17241.19,
+   "levels": {
+    "R2": 17357.1,
+    "R1": 17299.1,
+    "Pivot": 17239.3,
+    "S1": 17181.4,
+    "S2": 17121.6
+   },
+   "vix": 20.43,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-08",
+    "next_close": 17308.19,
+    "move": 67.0,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-08",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 17308.19,
+   "levels": {
+    "R2": 17456.2,
+    "R1": 17382.2,
+    "Pivot": 17299.5,
+    "S1": 17225.5,
+    "S2": 17142.8
+   },
+   "vix": 20.61,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-09",
+    "next_close": 17279.73,
+    "move": -28.46,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-09-09",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 17279.73,
+   "levels": {
+    "R2": 17359.9,
+    "R1": 17319.8,
+    "Pivot": 17294.7,
+    "S1": 17254.6,
+    "S2": 17229.5
+   },
+   "vix": 20.63,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-10",
+    "next_close": 17169.73,
+    "move": -110.0,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-10",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17169.73,
+   "levels": {
+    "R2": 17375.6,
+    "R1": 17272.7,
+    "Pivot": 17185.5,
+    "S1": 17082.6,
+    "S2": 16995.4
+   },
+   "vix": 21.04,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-11",
+    "next_close": 17267.69,
+    "move": 97.96,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-11",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 17267.69,
+   "levels": {
+    "R2": 17397.7,
+    "R1": 17332.7,
+    "Pivot": 17261.5,
+    "S1": 17196.5,
+    "S2": 17125.4
+   },
+   "vix": 21.46,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-14",
+    "next_close": 17250.52,
+    "move": -17.17,
+    "result": "Stayed in range",
+    "points": null,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-09-14",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 17250.52,
+   "levels": {
+    "R2": 17301.9,
+    "R1": 17276.2,
+    "Pivot": 17248.9,
+    "S1": 17223.2,
+    "S2": 17195.9
+   },
+   "vix": 21.32,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-15",
+    "next_close": 17351.36,
+    "move": 100.84,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-15",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 17351.36,
+   "levels": {
+    "R2": 17572.1,
+    "R1": 17461.7,
+    "Pivot": 17401.0,
+    "S1": 17290.6,
+    "S2": 17229.8
+   },
+   "vix": 21.59,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-16",
+    "next_close": 17350.92,
+    "move": -0.44,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-16",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 17350.92,
+   "levels": {
+    "R2": 17523.1,
+    "R1": 17437.0,
+    "Pivot": 17381.1,
+    "S1": 17295.0,
+    "S2": 17239.1
+   },
+   "vix": 21.02,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-17",
+    "next_close": 17189.06,
+    "move": -161.86,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-17",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17189.06,
+   "levels": {
+    "R2": 17399.0,
+    "R1": 17294.0,
+    "Pivot": 17233.1,
+    "S1": 17128.1,
+    "S2": 17067.1
+   },
+   "vix": 21.93,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-18",
+    "next_close": 17180.15,
+    "move": -8.91,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-18",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17180.15,
+   "levels": {
+    "R2": 17394.3,
+    "R1": 17287.2,
+    "Pivot": 17180.3,
+    "S1": 17073.2,
+    "S2": 16966.3
+   },
+   "vix": 22.41,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-21",
+    "next_close": 17195.06,
+    "move": 14.91,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-21",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17195.06,
+   "levels": {
+    "R2": 17518.3,
+    "R1": 17356.7,
+    "Pivot": 17255.4,
+    "S1": 17093.8,
+    "S2": 16992.5
+   },
+   "vix": 22.32,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-22",
+    "next_close": 17350.97,
+    "move": 155.91,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-22",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 17350.97,
+   "levels": {
+    "R2": 17768.9,
+    "R1": 17559.9,
+    "Pivot": 17445.4,
+    "S1": 17236.5,
+    "S2": 17122.0
+   },
+   "vix": 21.86,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-23",
+    "next_close": 17216.9,
+    "move": -134.07,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-23",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17216.9,
+   "levels": {
+    "R2": 17397.3,
+    "R1": 17307.1,
+    "Pivot": 17235.4,
+    "S1": 17145.2,
+    "S2": 17073.5
+   },
+   "vix": 22.01,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-24",
+    "next_close": 17217.7,
+    "move": 0.8,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-24",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17217.7,
+   "levels": {
+    "R2": 17413.6,
+    "R1": 17315.6,
+    "Pivot": 17232.8,
+    "S1": 17134.8,
+    "S2": 17051.9
+   },
+   "vix": 21.26,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-25",
+    "next_close": 16959.72,
+    "move": -257.98,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-25",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 16959.72,
+   "levels": {
+    "R2": 17040.8,
+    "R1": 17000.3,
+    "Pivot": 16930.6,
+    "S1": 16890.0,
+    "S2": 16820.4
+   },
+   "vix": 20.95,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-28",
+    "next_close": 17066.28,
+    "move": 106.56,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-28",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 17066.28,
+   "levels": {
+    "R2": 17262.3,
+    "R1": 17164.3,
+    "Pivot": 17078.0,
+    "S1": 16980.0,
+    "S2": 16893.7
+   },
+   "vix": 21.25,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-29",
+    "next_close": 16907.73,
+    "move": -158.55,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-09-29",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16907.73,
+   "levels": {
+    "R2": 17067.2,
+    "R1": 16987.5,
+    "Pivot": 16921.2,
+    "S1": 16841.4,
+    "S2": 16775.2
+   },
+   "vix": 21.28,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-09-30",
+    "next_close": 16641.74,
+    "move": -265.99,
+    "result": "Target hit",
+    "points": 66.2,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-09-30",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16641.74,
+   "levels": {
+    "R2": 16906.7,
+    "R1": 16774.2,
+    "Pivot": 16608.0,
+    "S1": 16475.5,
+    "S2": 16309.3
+   },
+   "vix": 21.08,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-01",
+    "next_close": 16639.52,
+    "move": -2.22,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-01",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16639.52,
+   "levels": {
+    "R2": 16795.0,
+    "R1": 16717.3,
+    "Pivot": 16607.1,
+    "S1": 16529.4,
+    "S2": 16419.2
+   },
+   "vix": 21.46,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-02",
+    "next_close": 16812.66,
+    "move": 173.14,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-02",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 16812.66,
+   "levels": {
+    "R2": 16932.5,
+    "R1": 16872.6,
+    "Pivot": 16817.8,
+    "S1": 16757.9,
+    "S2": 16703.1
+   },
+   "vix": 21.05,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-05",
+    "next_close": 16590.2,
+    "move": -222.46,
+    "result": "Target hit",
+    "points": 54.8,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-05",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16590.2,
+   "levels": {
+    "R2": 16714.6,
+    "R1": 16652.4,
+    "Pivot": 16582.1,
+    "S1": 16519.9,
+    "S2": 16449.6
+   },
+   "vix": 21.16,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-06",
+    "next_close": 16435.1,
+    "move": -155.1,
+    "result": "Target hit",
+    "points": 70.3,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-06",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16435.1,
+   "levels": {
+    "R2": 16616.8,
+    "R1": 16526.0,
+    "Pivot": 16459.6,
+    "S1": 16368.7,
+    "S2": 16302.3
+   },
+   "vix": 20.96,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-07",
+    "next_close": 16332.06,
+    "move": -103.04,
+    "result": "Target hit",
+    "points": 66.4,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-07",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16332.06,
+   "levels": {
+    "R2": 16363.0,
+    "R1": 16347.5,
+    "Pivot": 16321.8,
+    "S1": 16306.3,
+    "S2": 16280.6
+   },
+   "vix": 20.62,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-08",
+    "next_close": 16173.35,
+    "move": -158.71,
+    "result": "Stopped out",
+    "points": -15.5,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-08",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16173.35,
+   "levels": {
+    "R2": 16474.0,
+    "R1": 16323.7,
+    "Pivot": 16197.3,
+    "S1": 16046.9,
+    "S2": 15920.5
+   },
+   "vix": 20.81,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-09",
+    "next_close": 16235.16,
+    "move": 61.81,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-09",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 16235.16,
+   "levels": {
+    "R2": 16341.0,
+    "R1": 16288.1,
+    "Pivot": 16260.6,
+    "S1": 16207.7,
+    "S2": 16180.2
+   },
+   "vix": 20.41,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-12",
+    "next_close": 16124.07,
+    "move": -111.09,
+    "result": "Target hit",
+    "points": 27.5,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-12",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 16124.07,
+   "levels": {
+    "R2": 16203.9,
+    "R1": 16164.0,
+    "Pivot": 16100.9,
+    "S1": 16061.0,
+    "S2": 15997.8
+   },
+   "vix": 21.17,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-13",
+    "next_close": 16026.11,
+    "move": -97.96,
+    "result": "Stopped out",
+    "points": -39.9,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-13",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 16026.11,
+   "levels": {
+    "R2": 16308.0,
+    "R1": 16167.1,
+    "Pivot": 16057.8,
+    "S1": 15916.8,
+    "S2": 15807.6
+   },
+   "vix": 20.94,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-14",
+    "next_close": 16116.91,
+    "move": 90.8,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-14",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 16116.91,
+   "levels": {
+    "R2": 16336.6,
+    "R1": 16226.7,
+    "Pivot": 16087.9,
+    "S1": 15978.0,
+    "S2": 15839.2
+   },
+   "vix": 21.73,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-15",
+    "next_close": 16014.1,
+    "move": -102.81,
+    "result": "Stopped out",
+    "points": -109.9,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-15",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 16014.1,
+   "levels": {
+    "R2": 16197.6,
+    "R1": 16105.8,
+    "Pivot": 16038.1,
+    "S1": 15946.4,
+    "S2": 15878.6
+   },
+   "vix": 21.29,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-16",
+    "next_close": 16083.03,
+    "move": 68.93,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-16",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 16083.03,
+   "levels": {
+    "R2": 16200.2,
+    "R1": 16141.6,
+    "Pivot": 16085.1,
+    "S1": 16026.5,
+    "S2": 15970.0
+   },
+   "vix": 21.54,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-19",
+    "next_close": 15949.42,
+    "move": -133.61,
+    "result": "Target hit",
+    "points": 56.5,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-19",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 15949.42,
+   "levels": {
+    "R2": 16082.6,
+    "R1": 16016.0,
+    "Pivot": 15962.6,
+    "S1": 15896.1,
+    "S2": 15842.7
+   },
+   "vix": 21.06,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-20",
+    "next_close": 15782.68,
+    "move": -166.74,
+    "result": "Target hit",
+    "points": 53.4,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-20",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15782.68,
+   "levels": {
+    "R2": 15829.3,
+    "R1": 15806.0,
+    "Pivot": 15763.3,
+    "S1": 15740.0,
+    "S2": 15697.2
+   },
+   "vix": 20.52,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-21",
+    "next_close": 15530.32,
+    "move": -252.36,
+    "result": "Target hit",
+    "points": 42.8,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-21",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15530.32,
+   "levels": {
+    "R2": 15658.4,
+    "R1": 15594.3,
+    "Pivot": 15531.2,
+    "S1": 15467.2,
+    "S2": 15404.0
+   },
+   "vix": 20.58,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-22",
+    "next_close": 15798.97,
+    "move": 268.65,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-22",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 15798.97,
+   "levels": {
+    "R2": 15853.8,
+    "R1": 15826.4,
+    "Pivot": 15811.3,
+    "S1": 15783.9,
+    "S2": 15768.7
+   },
+   "vix": 20.86,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-23",
+    "next_close": 15759.8,
+    "move": -39.17,
+    "result": "Target hit",
+    "points": 15.2,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-10-23",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 15759.8,
+   "levels": {
+    "R2": 15866.3,
+    "R1": 15813.1,
+    "Pivot": 15738.9,
+    "S1": 15685.7,
+    "S2": 15611.6
+   },
+   "vix": 20.35,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-26",
+    "next_close": 15800.76,
+    "move": 40.96,
+    "result": "Stopped out",
+    "points": -53.2,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-26",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 15800.76,
+   "levels": {
+    "R2": 15944.1,
+    "R1": 15872.4,
+    "Pivot": 15759.9,
+    "S1": 15688.2,
+    "S2": 15575.7
+   },
+   "vix": 20.82,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-27",
+    "next_close": 15802.66,
+    "move": 1.9,
+    "result": "Stopped out",
+    "points": -71.7,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-27",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 15802.66,
+   "levels": {
+    "R2": 15943.0,
+    "R1": 15872.8,
+    "Pivot": 15780.1,
+    "S1": 15710.0,
+    "S2": 15617.3
+   },
+   "vix": 20.5,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-28",
+    "next_close": 15831.76,
+    "move": 29.1,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-28",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 15831.76,
+   "levels": {
+    "R2": 15934.3,
+    "R1": 15883.0,
+    "Pivot": 15821.8,
+    "S1": 15770.6,
+    "S2": 15709.4
+   },
+   "vix": 20.55,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-29",
+    "next_close": 15845.18,
+    "move": 13.42,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-29",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 15845.18,
+   "levels": {
+    "R2": 15925.7,
+    "R1": 15885.4,
+    "Pivot": 15865.2,
+    "S1": 15824.9,
+    "S2": 15804.7
+   },
+   "vix": 20.71,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-10-30",
+    "next_close": 16126.1,
+    "move": 280.92,
+    "result": "Broke above R1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-10-30",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 16126.1,
+   "levels": {
+    "R2": 16301.0,
+    "R1": 16213.6,
+    "Pivot": 16146.8,
+    "S1": 16059.4,
+    "S2": 15992.6
+   },
+   "vix": 20.94,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-02",
+    "next_close": 15982.41,
+    "move": -143.69,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-02",
+   "bias": "NONE",
+   "score": -0.5,
+   "close": 15982.41,
+   "levels": {
+    "R2": 16031.4,
+    "R1": 16006.9,
+    "Pivot": 15976.0,
+    "S1": 15951.4,
+    "S2": 15920.5
+   },
+   "vix": 20.22,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-03",
+    "next_close": 15766.25,
+    "move": -216.16,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-03",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 15766.25,
+   "levels": {
+    "R2": 15917.7,
+    "R1": 15842.0,
+    "Pivot": 15746.4,
+    "S1": 15670.7,
+    "S2": 15575.2
+   },
+   "vix": 20.87,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-04",
+    "next_close": 15629.56,
+    "move": -136.69,
+    "result": "Target hit",
+    "points": 95.5,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-11-04",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 15629.56,
+   "levels": {
+    "R2": 15773.6,
+    "R1": 15701.6,
+    "Pivot": 15622.7,
+    "S1": 15550.7,
+    "S2": 15471.7
+   },
+   "vix": 21.1,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-05",
+    "next_close": 15449.11,
+    "move": -180.45,
+    "result": "Target hit",
+    "points": 79.0,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-11-05",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 15449.11,
+   "levels": {
+    "R2": 15693.0,
+    "R1": 15571.1,
+    "Pivot": 15491.3,
+    "S1": 15369.3,
+    "S2": 15289.5
+   },
+   "vix": 20.93,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-06",
+    "next_close": 15559.55,
+    "move": 110.44,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-06",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 15559.55,
+   "levels": {
+    "R2": 15669.0,
+    "R1": 15614.3,
+    "Pivot": 15584.1,
+    "S1": 15529.4,
+    "S2": 15499.3
+   },
+   "vix": 20.52,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-09",
+    "next_close": 15681.12,
+    "move": 121.57,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-09",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 15681.12,
+   "levels": {
+    "R2": 15804.0,
+    "R1": 15742.6,
+    "Pivot": 15671.7,
+    "S1": 15610.2,
+    "S2": 15539.3
+   },
+   "vix": 19.84,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-10",
+    "next_close": 15552.26,
+    "move": -128.86,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-10",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 15552.26,
+   "levels": {
+    "R2": 15587.5,
+    "R1": 15569.9,
+    "Pivot": 15545.3,
+    "S1": 15527.7,
+    "S2": 15503.2
+   },
+   "vix": 19.29,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-11",
+    "next_close": 15365.0,
+    "move": -187.26,
+    "result": "Target hit",
+    "points": 24.5,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-11-11",
+   "bias": "PUT",
+   "score": -2.5,
+   "close": 15365.0,
+   "levels": {
+    "R2": 15448.9,
+    "R1": 15406.9,
+    "Pivot": 15375.7,
+    "S1": 15333.8,
+    "S2": 15302.5
+   },
+   "vix": 19.51,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-12",
+    "next_close": 15322.14,
+    "move": -42.86,
+    "result": "Stopped out",
+    "points": -41.9,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-11-12",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15322.14,
+   "levels": {
+    "R2": 15511.6,
+    "R1": 15416.9,
+    "Pivot": 15283.0,
+    "S1": 15188.3,
+    "S2": 15054.4
+   },
+   "vix": 19.38,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-13",
+    "next_close": 15521.39,
+    "move": 199.25,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-13",
+   "bias": "NONE",
+   "score": -1.5,
+   "close": 15521.39,
+   "levels": {
+    "R2": 15613.6,
+    "R1": 15567.5,
+    "Pivot": 15541.4,
+    "S1": 15495.3,
+    "S2": 15469.2
+   },
+   "vix": 18.92,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-16",
+    "next_close": 15138.52,
+    "move": -382.87,
+    "result": "Broke below S1",
+    "points": null,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-16",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15138.52,
+   "levels": {
+    "R2": 15282.0,
+    "R1": 15210.3,
+    "Pivot": 15090.7,
+    "S1": 15019.0,
+    "S2": 14899.5
+   },
+   "vix": 18.71,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-17",
+    "next_close": 15216.53,
+    "move": 78.01,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-17",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15216.53,
+   "levels": {
+    "R2": 15341.1,
+    "R1": 15278.8,
+    "Pivot": 15227.2,
+    "S1": 15164.9,
+    "S2": 15113.3
+   },
+   "vix": 19.34,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-18",
+    "next_close": 15075.95,
+    "move": -140.58,
+    "result": "Target hit",
+    "points": 51.6,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-11-18",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15075.95,
+   "levels": {
+    "R2": 15152.3,
+    "R1": 15114.1,
+    "Pivot": 15082.6,
+    "S1": 15044.4,
+    "S2": 15012.9
+   },
+   "vix": 19.21,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-19",
+    "next_close": 15223.86,
+    "move": 147.91,
+    "result": "Not triggered",
+    "points": 0.0,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-19",
+   "bias": "PUT",
+   "score": -3.5,
+   "close": 15223.86,
+   "levels": {
+    "R2": 15335.5,
+    "R1": 15279.7,
+    "Pivot": 15213.5,
+    "S1": 15157.7,
+    "S2": 15091.6
+   },
+   "vix": 18.97,
+   "pcr": null,
+   "backfilled": true,
+   "outcome": {
+    "next_date": "2026-11-20",
+    "next_close": 15082.91,
+    "move": -140.95,
+    "result": "Target hit",
+    "points": 66.1,
+    "direction_ok": true
+   }
+  },
+  {
+   "date": "2026-11-20",
+   "bias": "PUT",
+   "score": -4.5,
+   "close": 15082.91,
+   "levels": {
+    "R2": 15158.5,
+    "R1": 15120.7,
+    "Pivot": 15057.0,
+    "S1": 15019.2,
+    "S2": 14955.6
+   },
+   "vix": 19.51,
+   "pcr": 1.11,
+   "backfilled": false,
+   "outcome": null
+  }
+ ]
+}
