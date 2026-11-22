@@ -70,7 +70,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data.json track.json
-          for f in oc_cache.json gap_track.json analysis_track.json; do [ -f "$f" ] && git add "$f"; done
+          for f in oc_cache.json gap_track.json analysis_track.json fii_dii_track.json; do [ -f "$f" ] && git add "$f"; done
           git diff --cached --quiet || git commit -m "Data update $(date -u '+%F %H:%M') UTC"
           git pull --rebase -q || true
           git push

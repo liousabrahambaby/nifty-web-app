@@ -343,6 +343,75 @@ def fetch_fii_dii():
     return out
 
 
+FLOW_TRACK = "fii_dii_track.json"
+
+
+def _flow_date(s):
+    """NSE's '20-Nov-2026' -> '2026-11-20' (ISO dates sort correctly)."""
+    try:
+        return dt.datetime.strptime(str(s), "%d-%b-%Y").strftime("%Y-%m-%d")
+    except ValueError:
+        return None
+
+
+def demo_flow_entries(n=60):
+    rng = np.random.default_rng(7)
+    days = pd.bdate_range(end=dt.date(2026, 11, 20), periods=n)
+    out = []
+    for i, d in enumerate(days):
+        f = float(rng.normal(-900 + 25 * i, 2600))
+        dn = float(-0.7 * f + rng.normal(600, 1500))
+        fb, db = float(rng.uniform(11000, 16000)), float(rng.uniform(11000, 16000))
+        out.append({"date": d.strftime("%Y-%m-%d"),
+                    "fii": {"buy": round(fb, 2), "sell": round(fb - f, 2), "net": round(f, 2)},
+                    "dii": {"buy": round(db, 2), "sell": round(db - dn, 2), "net": round(dn, 2)}})
+    return out
+
+
+def _streak(nets):
+    """+n = bought the last n sessions in a row, -n = sold the last n sessions in a row."""
+    if not nets or nets[-1] == 0:
+        return 0
+    sign, n = (1 if nets[-1] > 0 else -1), 0
+    for v in reversed(nets):
+        if v * sign <= 0:
+            break
+        n += 1
+    return sign * n
+
+
+def flow_history(flows, demo):
+    """Add the latest FII/DII day to fii_dii_track.json (one row per trading day, no duplicates)
+    and return the last 60 days plus 5/20-day totals and buying/selling streaks."""
+    if demo:
+        entries = demo_flow_entries()
+    else:
+        entries = []
+        if os.path.exists(FLOW_TRACK):
+            with open(FLOW_TRACK) as f:
+                entries = json.load(f).get("entries", [])
+        day = flows and _flow_date(flows.get("date"))
+        if day and "fii" in flows and "dii" in flows:
+            entries = [e for e in entries if e["date"] != day] + [
+                {"date": day, "fii": flows["fii"], "dii": flows["dii"]}]
+            entries.sort(key=lambda e: e["date"])
+            entries = entries[-750:]  # about three years
+            with open(FLOW_TRACK, "w") as f:
+                json.dump({"entries": entries}, f, indent=1)
+    if not entries:
+        return None
+    fii = [e["fii"]["net"] for e in entries]
+    dii = [e["dii"]["net"] for e in entries]
+    tot = lambda xs, n: round(sum(xs[-n:]), 2)
+    return {
+        "entries": entries[-60:],
+        "days": len(entries),
+        "summary": {"fii_5d": tot(fii, 5), "fii_20d": tot(fii, 20), "dii_5d": tot(dii, 5), "dii_20d": tot(dii, 20),
+                    "fii_streak": _streak(fii), "dii_streak": _streak(dii),
+                    "days_5": min(5, len(fii)), "days_20": min(20, len(fii))},
+    }
+
+
 def demo_news():
     now = dt.datetime.now(IST)
     rows = [
@@ -360,10 +429,13 @@ def demo_news():
              "time": (now - dt.timedelta(hours=2 * i + 1)).isoformat(timespec="minutes")} for i, (t, tp) in enumerate(rows)]
 
 
-def get_news(demo):
+def get_news(demo, prev=None):
+    """Headlines plus FII/DII flows. `prev` is the last news block: if NSE fails, its
+    FII/DII figures are kept rather than showing none."""
     if demo:
-        return {"items": demo_news(), "fii_dii": {"date": "20-Nov-2026", "fii": {"buy": 11234.5, "sell": 13890.2, "net": -2655.7},
-                                                     "dii": {"buy": 14520.8, "sell": 11102.4, "net": 3418.4}},
+        flows = {"date": "20-Nov-2026", "fii": {"buy": 11234.5, "sell": 13890.2, "net": -2655.7},
+                 "dii": {"buy": 14520.8, "sell": 11102.4, "net": 3418.4}}
+        return {"items": demo_news(), "fii_dii": flows, "flow_history": flow_history(flows, True),
                 "updated": dt.datetime.now(IST).strftime("%d %b %Y, %I:%M %p IST")}
     try:
         items = fetch_news()
@@ -375,7 +447,24 @@ def get_news(demo):
     except Exception as e:
         print("FII/DII fetch failed:", e)
         flows = None
-    return {"items": items, "fii_dii": flows, "updated": dt.datetime.now(IST).strftime("%d %b %Y, %I:%M %p IST")}
+    if not flows and prev:
+        flows = prev.get("fii_dii")  # keep the last figures rather than none
+    try:
+        hist = flow_history(flows, False)
+    except Exception as e:  # never let the history block the news update
+        print("FII/DII history failed:", type(e).__name__, e)
+        hist = (prev or {}).get("flow_history")
+    return {"items": items, "fii_dii": flows, "flow_history": hist,
+            "updated": dt.datetime.now(IST).strftime("%d %b %Y, %I:%M %p IST")}
+
+
+def previous_news():
+    """The news block from the existing data.json, if any (used as a fallback)."""
+    try:
+        with open("data.json") as f:
+            return json.load(f).get("news")
+    except (OSError, ValueError):
+        return None
 
 
 # =====================================================================
@@ -698,9 +787,7 @@ def premarket(demo):
     """Morning run (~8:15 AM IST): news, global markets and the opening-gap forecast."""
     with open("data.json") as f:
         data = json.load(f)
-    fresh = get_news(demo)
-    if not fresh["fii_dii"] and data.get("news", {}).get("fii_dii"):
-        fresh["fii_dii"] = data["news"]["fii_dii"]
+    fresh = get_news(demo, data.get("news"))
     data["news"] = fresh
     data["global"] = get_global(demo, data["as_of"])
     gift = get_gift(demo, data["last"]["close"], data["as_of"])
@@ -723,9 +810,7 @@ def hourly(demo):
     and the 8:15 AM pre-market run)."""
     with open("data.json") as f:
         data = json.load(f)
-    fresh = get_news(demo)
-    if not fresh["fii_dii"] and data.get("news", {}).get("fii_dii"):
-        fresh["fii_dii"] = data["news"]["fii_dii"]  # keep the last figures rather than none
+    fresh = get_news(demo, data.get("news"))
     data["news"] = fresh
     glob = get_global(demo, data["as_of"])
     if glob["rows"] or not data.get("global"):  # keep the last good snapshot if the fetch failed
@@ -739,9 +824,7 @@ def news_only(demo):
     """Refresh just the news section of an existing data.json (used by the morning run)."""
     with open("data.json") as f:
         data = json.load(f)
-    fresh = get_news(demo)
-    if not fresh["fii_dii"] and data.get("news", {}).get("fii_dii"):
-        fresh["fii_dii"] = data["news"]["fii_dii"]  # keep yesterday's figures rather than none
+    fresh = get_news(demo, data.get("news"))
     data["news"] = fresh
     with open("data.json", "w") as f:
         json.dump(data, f)
@@ -1566,7 +1649,7 @@ AI_SCHEMA = {
 
 AI_SYSTEM = """You write the after-close technical note on the Nifty 50 for a dashboard used by Indian retail traders, many of whom buy index options.
 
-You receive the last 40 daily sessions, the current indicators, the rule-based signal, pivot and option-chain levels, and what a pattern scanner found: candlestick patterns, chart patterns, trendlines, support/resistance zones, Fibonacci levels, RSI divergence, ADX and swing structure. Treat the scanner's output as a first pass, not as truth. Check each finding against the price data, say plainly when a pattern is weak or the evidence conflicts, and weigh it accordingly.
+You receive the last 40 daily sessions, the current indicators, the rule-based signal, pivot and option-chain levels, and what a pattern scanner found: candlestick patterns, chart patterns, trendlines, support/resistance zones, Fibonacci levels, RSI divergence, ADX and swing structure. When FII/DII cash-market flows are included (Rs crore, with 5- and 20-day totals and buying or selling streaks), use them as context for how strong a move is likely to be, not as a price signal on their own. Treat the scanner's output as a first pass, not as truth. Check each finding against the price data, say plainly when a pattern is weak or the evidence conflicts, and weigh it accordingly.
 
 Use only the data given. Do not mention news, events or prices that are not in it. Every price you cite must come from the data or follow directly from it.
 
@@ -1635,6 +1718,7 @@ def ai_context(df, ta, D):
     w = df.iloc[-40:]
     r = df.iloc[-1]
     oc = D.get("option_chain")
+    fh = (D.get("news") or {}).get("flow_history")
     return {
         "as_of": D["as_of"], "next_session": D["playbook"]["session"],
         "sessions": [{"date": d.strftime("%Y-%m-%d"), "o": round(float(x.Open), 1), "h": round(float(x.High), 1),
@@ -1645,6 +1729,10 @@ def ai_context(df, ta, D):
         "signal": D["signal"], "pivots_and_oi_levels": D["levels"],
         "option_chain": None if not oc else {k: oc.get(k) for k in ("expiry", "pcr", "max_ce_oi_strike", "max_pe_oi_strike", "max_pain", "stale")},
         "india_vix": D.get("vix"), "alerts": [a["title"] for a in D.get("alerts", [])],
+        "fii_dii_flows_rs_crore": None if not fh else {
+            "summary": fh["summary"],  # streak: +n = net buyers n sessions running, -n = net sellers
+            "last_10_days": [{"date": e["date"], "fii_net": e["fii"]["net"], "dii_net": e["dii"]["net"]}
+                             for e in fh["entries"][-10:]]},
         "scanner": ta,
     }
 
@@ -1790,7 +1878,7 @@ def main():
         "intraday": get_intraday(demo, float(last.Close)),
         "playbook": build_playbook(last, lv, oc, vix, bias),
         "alerts": build_alerts(df, oc, vix, vix_prev, bias, lv),
-        "news": get_news(demo),
+        "news": get_news(demo, previous_news()),
         "global": get_global(demo, as_of.strftime("%Y-%m-%d")),
         "premarket": premarket_evening(demo, df, float(last.Close)),
     }

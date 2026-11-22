@@ -110,6 +110,10 @@ Pages with Cloudflare Access, or Netlify with password protection).
 - `track.json` – the permanent signal log. Don't delete it, or the track record restarts.
 - `oc_cache.json` – last good option-chain snapshot, shown (flagged as old) if NSE fails.
 - `analysis_track.json` – every day's AI/technical outlook and whether the next session agreed.
+- `fii_dii_track.json` – FII/DII cash-market buy, sell and net figures, one row per trading day.
+  NSE only publishes the latest day, so this is the only place the history exists; don't delete it.
+  It feeds the **FII / DII trend** chart under the news (daily or cumulative net, 5- and 20-day totals,
+  buying/selling streaks) and the AI analysis.
 
 ## If the option chain shows "couldn't be fetched"
 NSE often blocks requests from cloud servers, including GitHub's. Prices, VIX

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fmt, ago } from '../lib/format'
+import FlowHistory from './FlowHistory.jsx'
 
 const MARK = { positive: '▲', negative: '▼', neutral: '•' }
 const WORD = { positive: 'Likely positive', negative: 'Likely negative', neutral: 'Neutral' }
@@ -22,6 +23,7 @@ export default function News({ D }) {
           </p>
         </div>
       </div>
+      {N && <FlowHistory H={N.flow_history} />}
     </section>
   )
 }
