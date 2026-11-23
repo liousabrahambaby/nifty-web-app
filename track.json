@@ -1443,7 +1443,7 @@
   {
    "date": "2026-11-20",
    "bias": "CALL",
-   "score": 4.0,
+   "score": 3.5,
    "close": 25800.6,
    "levels": {
     "R2": 26115.1,
@@ -1453,7 +1453,7 @@
     "S2": 25187.9
    },
    "vix": 17.32,
-   "pcr": 1.67,
+   "pcr": 0.74,
    "backfilled": false,
    "outcome": null
   }
