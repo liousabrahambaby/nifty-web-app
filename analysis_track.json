@@ -7,6 +7,17 @@
    "confidence": "medium",
    "source": "rules",
    "headline": "Charts lean bullish. Holding above 25,768 keeps buyers in charge.",
+   "result": "wrong",
+   "next_close": 25349.7,
+   "next_change_pct": -1.75
+  },
+  {
+   "date": "2026-11-23",
+   "close": 25349.7,
+   "outlook": "neutral",
+   "confidence": "low",
+   "source": "rules",
+   "headline": "Mixed signals. Let a break of 25,768 or 24,685 pick the direction.",
    "result": null
   }
  ]

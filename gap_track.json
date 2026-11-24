@@ -7,7 +7,11 @@
    "pts": 13.5,
    "open_est": 25814.1,
    "method": "GIFT Nifty",
-   "actual_pct": null
+   "actual_pct": 0.5,
+   "actual_open": 25929.2,
+   "actual_call": "Gap up",
+   "right_direction": false,
+   "error_pts": 115.1
   }
  ]
 }

@@ -1455,6 +1455,30 @@
    "vix": 17.32,
    "pcr": 0.74,
    "backfilled": false,
+   "outcome": {
+    "next_date": "2026-11-23",
+    "next_close": 25349.65,
+    "move": -450.95,
+    "result": "Stopped out",
+    "points": -306.4,
+    "direction_ok": false
+   }
+  },
+  {
+   "date": "2026-11-23",
+   "bias": "CALL",
+   "score": 3.0,
+   "close": 25349.65,
+   "levels": {
+    "R2": 26210.8,
+    "R1": 25780.2,
+    "Pivot": 25562.0,
+    "S1": 25131.5,
+    "S2": 24913.3
+   },
+   "vix": 17.7,
+   "pcr": 0.7,
+   "backfilled": false,
    "outcome": null
   }
  ]
