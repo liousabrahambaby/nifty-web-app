@@ -2,10 +2,10 @@
  "entries": [
   {
    "date": "2026-11-23",
-   "call": "Big gap down",
-   "pct": -1.86,
-   "pts": -480.0,
-   "open_est": 25320.6,
+   "call": "Flat open",
+   "pct": 0.05,
+   "pts": 13.5,
+   "open_est": 25814.1,
    "method": "GIFT Nifty",
    "actual_pct": null
   }
