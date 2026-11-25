@@ -12,6 +12,15 @@
    "actual_call": "Gap up",
    "right_direction": false,
    "error_pts": 115.1
+  },
+  {
+   "date": "2026-11-24",
+   "call": "Gap up",
+   "pct": 0.22,
+   "pts": 56.0,
+   "open_est": 25405.7,
+   "method": "GIFT Nifty",
+   "actual_pct": null
   }
  ]
 }
