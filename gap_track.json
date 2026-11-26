@@ -15,10 +15,10 @@
   },
   {
    "date": "2026-11-24",
-   "call": "Gap up",
-   "pct": 0.22,
-   "pts": 56.0,
-   "open_est": 25405.7,
+   "call": "Flat open",
+   "pct": -0.11,
+   "pts": -27.5,
+   "open_est": 25322.2,
    "method": "GIFT Nifty",
    "actual_pct": null
   }
