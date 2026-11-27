@@ -21,6 +21,15 @@
    "open_est": 25322.2,
    "method": "GIFT Nifty",
    "actual_pct": null
+  },
+  {
+   "date": "2026-11-26",
+   "call": "Big gap down",
+   "pct": -1.15,
+   "pts": -298.0,
+   "open_est": 25521.2,
+   "method": "GIFT Nifty",
+   "actual_pct": null
   }
  ]
 }
